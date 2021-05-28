@@ -56,7 +56,7 @@ object MethodHelper {
      * @param msg
      * using for show short toast
      */
-    fun showLoangToast(ctx : Context, msg : String ) {
+    fun showLongToast(ctx : Context, msg : String ) {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
     }
 
@@ -336,16 +336,12 @@ object MethodHelper {
      * using for get device id
      */
     @SuppressLint("HardwareIds")
-    fun doGetDeviceID(ctx : Context) : String{
-        val ID = Settings.Secure.getString(ctx.contentResolver,
-            Settings.Secure.ANDROID_ID)
-        return ID
-    }
+    fun doGetDeviceID(ctx : Context) =  Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID)
+
 
     /**
      * usinf for getdevicename
      */
-    fun getDeviceName() : String{
-        return Build.DEVICE +" "+ Build.BRAND +" "+ Build.MANUFACTURER
-    }
+    fun getDeviceName() = Build.DEVICE +" "+ Build.BRAND +" "+ Build.MANUFACTURER
+
 }
