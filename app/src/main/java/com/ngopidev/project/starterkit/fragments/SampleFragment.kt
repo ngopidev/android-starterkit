@@ -25,7 +25,7 @@ class SampleFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         sampleBinding = FragmentSampleBinding.inflate(inflater, container, false)
         return sampleBinding.root
     }

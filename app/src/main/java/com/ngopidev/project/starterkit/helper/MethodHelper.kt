@@ -43,51 +43,47 @@ import java.util.*
  **/
 object MethodHelper {
     /**
-     * @param ctx
      * @param msg
-     * using for show short toast
      */
-    fun showShortToast(ctx : Context, msg : String ) {
-        Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
-    }
+        /**
+         * simple short toast
+         */
+        infix fun Context.shortToast(message : String){
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+
+        /**
+         * simple long toast
+         */
+        infix fun Context.longToast(message : String){
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
 
     /**
-     * @param ctx
-     * @param msg
-     * using for show short toast
+     * simple intent method
      */
-    fun showLongToast(ctx : Context, msg : String ) {
-        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
-    }
+        /**
+         * move to another page
+         * it cannot handle intent extras inside
+         */
+        infix fun <T : Any> Context.goTo(pindahKelas : Class<T>){
+            startActivity(Intent(this, pindahKelas))
+        }
+
+        /**
+         * move to another page
+         * second method with intent parameter
+         * it can handle intent with extras inside
+         */
+        infix fun Context.goTo(intentData : Intent){
+            startActivity(intentData)
+        }
+
 
     /**
-     * @param ctx
-     * @param goto
-     * using for do intent for one to another activity
+     * change currencty to IDR
      */
-    fun <T : Any> goTo(ctx : Context, goto : Class<T>){
-        ctx.startActivity(Intent(ctx, goto))
-    }
-
-    /**
-     * @param ctx
-     * @param goto
-     * @param key
-     * @param stringExtras
-     * using for do intent for one to another activity plus string extras
-     */
-    fun <T : Any> goTo(ctx : Context, goto : Class<T>, key : String, stringExtras : String){
-        val intent =  Intent(ctx, goto)
-        intent.putExtra(key, stringExtras)
-        ctx.startActivity(intent)
-    }
-
-    /**
-     * @param nilai
-     * @return String
-     * using for change currency to idr /Rp
-     */
-    fun changeCurrencytoIDR(nilai : Double) : String{
+    infix fun Context.currencyRp(nilai : Double) : String{
         val localeId = Locale("in", "ID")
         val formatRupiah = NumberFormat.getCurrencyInstance(localeId)
         return formatRupiah.format(nilai)
@@ -96,62 +92,43 @@ object MethodHelper {
     /**
      * @param saved
      * @param color
-     * using for change view of all navigation background (android sdk > lollipop)
+     * using for change view of all navigation background
      */
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun setNavBackground(saved: AppCompatActivity, color : Int){
-        val windows = saved.window
-        windows.navigationBarColor = saved.resources.getColor(color)
+    infix fun AppCompatActivity.setNavBckg(color : Int){
+        val windows = window
+        windows.navigationBarColor = resources.getColor(color)
     }
 
     /**
      * @param saved
      * @param color
-     * using for change background of notification bar (android sdk > lollipop)
+     * using for change background of notification bar
      */
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun setWindowsBar(saved : AppCompatActivity, color: Int){
-        val windows = saved.window
+    infix fun AppCompatActivity.setNotificationBar( color: Int){
+        val windows = window
         windows.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         windows.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        windows.setStatusBarColor(ContextCompat.getColor(saved, color))
+        windows.setStatusBarColor(ContextCompat.getColor(this, color))
     }
 
 
     /**
-     * @param ctx
-     * @return Boolean
-     * cek permission return true if all granted, return false if some Denied
-     * note : add all permission you need here
+     * cek all permission needed
      */
-    fun checkPermissionNeed(ctx : Context) : Boolean{
-        return PermissionChecker.checkSelfPermission(
-            ctx, Manifest.permission.CAMERA) == PermissionChecker.PERMISSION_GRANTED
-                && PermissionChecker.checkSelfPermission(
-            ctx, Manifest.permission.READ_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED
-                && PermissionChecker.checkSelfPermission(
-            ctx, Manifest.permission.READ_PHONE_STATE) == PermissionChecker.PERMISSION_GRANTED
-    }
-
-    /**
-     * @param ctx as AppCompatActivity
-     * note : add all permission you need here
-     */
-    fun reqAllPermission(ctx: AppCompatActivity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val permisi = arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.READ_PHONE_STATE
-            )
-            if (PermissionChecker.checkSelfPermission(ctx, Manifest.permission.CAMERA) != PermissionChecker.PERMISSION_GRANTED
-                && PermissionChecker.checkSelfPermission( ctx, Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PermissionChecker.PERMISSION_GRANTED
-                && PermissionChecker.checkSelfPermission( ctx, Manifest.permission.READ_PHONE_STATE
-                ) != PermissionChecker.PERMISSION_GRANTED) {
-                ctx.requestPermissions(permisi, Const.REQCODE)
-            }
+    infix fun Context.cekPermission(permissions : Array<String>) : Boolean {
+        return permissions.all {
+            PermissionChecker.checkSelfPermission(this, it) == PermissionChecker.PERMISSION_GRANTED
         }
+    }
+
+    /**
+     * request all permission
+     */
+    @RequiresApi(Build.VERSION_CODES.M)
+    infix fun AppCompatActivity.reqPermission(permissions : Array<String>){
+        this.requestPermissions(permissions, Const.REQCODE)
     }
 
     /**
@@ -225,15 +202,14 @@ object MethodHelper {
 
     /**
      * Jpeg new Compressor
-     * using for compress image to JPG for android sdk 11
+     * work in android-11
      */
-
-    fun jpegNewCompressor(context : Context, bitmap: Bitmap) : File {
+    infix fun Context.jpegCompressor(bitmap: Bitmap) : File {
         val bos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos)
         val bitmapData = bos.toByteArray()
-        val locpath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val filex = File(locpath!!,"BN_${System.currentTimeMillis()}_img.jpg")
+        val locpath = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val filex = File(locpath!!,"NGOPIDEV_${System.currentTimeMillis()}_img.jpg")
 
         try{
             filex.createNewFile()
@@ -248,12 +224,10 @@ object MethodHelper {
     }
 
     /**
-     * get app version bycode
-     * @param ctx
-     * @return String
+     * get app version
      */
-    fun getAppsVersion(ctx : Context) : String{
-        val info = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
+    fun Context.hasVersion() : String{
+        val info = packageManager.getPackageInfo(packageName, 0)
         return  info.versionName
     }
 
@@ -288,7 +262,7 @@ object MethodHelper {
     /**
      * using for execute retrofit2 services
      */
-    fun doRetrofitExecute() : APIServices{
+    fun Context.doRetrofitExecute() : APIServices{
 
         val client = OkHttpClient.Builder().build()
         val gson = GsonBuilder()
@@ -308,7 +282,7 @@ object MethodHelper {
      * using for execute retrofit activities
      * and data which send is json type
      */
-    fun doRetrofitExecuteJSON() : APIServices{
+    fun Context.doRetrofitExecuteJSON() : APIServices{
         val httpClient = OkHttpClient.Builder().addInterceptor(object : Interceptor {
             override fun intercept(chain: Interceptor.Chain): Response {
                 val requester = chain.request()
