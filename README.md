@@ -10,7 +10,8 @@ serta konsep yang akan digunakan oleh [NGOPI] Software Development dalam setiap 
 ## Library :
  1. Retrofit2
  2. Glide
- 3. Other
+ 3. Kodein
+ 4. Other
 
 ## Language :
  1. Kotlin
